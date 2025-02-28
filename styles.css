@@ -1,0 +1,142 @@
+html, body {
+    height: 100%; /* Asegura que el body y html ocupen toda la altura */
+    margin: 0; /* Elimina el margen predeterminado */
+    padding: 0; /* Elimina el padding predeterminado */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); /* Degradado oscuro */
+    color: white; /* Texto blanco para contrastar con el fondo oscuro */
+    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
+	margin: 0;
+}
+
+
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Coloca las partículas detrás del contenido */
+    pointer-events: none; /* Permite interactuar con el contenido de la página */
+}
+
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.7); /* Color de las partículas */
+    border-radius: 50%;
+    animation: float 5s infinite ease-in-out;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100vw);
+        opacity: 0;
+    }
+}
+
+#searchContainer {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#searchInput {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+}
+
+#searchButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#searchButton:hover {
+    background-color: #0056b3;
+}
+
+#typeSelector {
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+}
+
+#results {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.result-item {
+    text-align: center;
+    flex: 1 1 150px;
+    max-width: 150px;
+    background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.result-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.result-item h2 {
+    font-size: 16px;
+    margin: 10px 0 5px;
+}
+
+.result-item p {
+    font-size: 14px;
+    color: #ccc;
+}
+
+#player {
+    width: 800px;
+    height: 450px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #555;
+    box-sizing: border-box;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+}
+
+#episodeControls {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#imdbIdDisplay {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #ccc;
+}
