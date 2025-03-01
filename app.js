@@ -1,5 +1,3 @@
-require('dotenv').config({ path: './av.env' });
-
 
 document.getElementById('searchButton').addEventListener('click', () => {
     const query = document.getElementById('searchInput').value;
@@ -56,7 +54,7 @@ let currentEpisode = 1;
 
 function searchContent(query) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = process.env.API_KEY;
+    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
     const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
 
     // Ocultar el cuadro del video anterior y limpiar el contenido
@@ -167,7 +165,7 @@ function embedTvShow(tmdbId, season, episode) {
 
 function fetchContentDetails(contentId) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = process.env.API_KEY;
+    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
     const url = `https://api.themoviedb.org/3/${type}/${contentId}?api_key=${apiKey}`;
 
     return fetch(url)
@@ -284,7 +282,7 @@ async function searchContent(query) {
     await actualizarTituloPagina();
 
     const type = document.getElementById('typeSelector').value;
-    const apiKey = process.env.API_KEY;
+    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
     const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
 
     // Ocultar el cuadro del video anterior y limpiar el contenido
