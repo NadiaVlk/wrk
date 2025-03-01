@@ -1,3 +1,5 @@
+require('dotenv').config({ path: './ns.env' });
+
 document.getElementById('searchButton').addEventListener('click', () => {
     const query = document.getElementById('searchInput').value;
     if (query) {
@@ -43,7 +45,7 @@ let currentEpisode = 1;
 
 function searchContent(query) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
+    const apiKey = av.env.API_KEY; // Leer la API Key desde ns.env
     const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
 
     // Ocultar el cuadro del video anterior y limpiar el contenido
@@ -151,7 +153,7 @@ function embedTvShow(tmdbId, season, episode) {
 
 function fetchContentDetails(contentId) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
+    const apiKey = av.env.API_KEY; // Leer la API Key desde ns.env
     const url = `https://api.themoviedb.org/3/${type}/${contentId}?api_key=${apiKey}`;
 
     return fetch(url)
