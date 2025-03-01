@@ -1,4 +1,5 @@
-require('dotenv').config({ path: './ns.env' });
+require('dotenv').config({ path: './av.env' });
+
 
 document.getElementById('searchButton').addEventListener('click', () => {
     const query = document.getElementById('searchInput').value;
@@ -12,9 +13,11 @@ document.getElementById('searchInput').addEventListener('keypress', (event) => {
         const query = document.getElementById('searchInput').value;
         if (query) {
             searchContent(query);
+
         }
     }
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const particlesContainer = document.getElementById('particles');
@@ -36,16 +39,24 @@ document.getElementById('nextSeason').addEventListener('click', () => changeSeas
 document.getElementById('prevEpisode').addEventListener('click', () => changeEpisode(-1));
 document.getElementById('nextEpisode').addEventListener('click', () => changeEpisode(1));
 
-document.getElementById('seasonInput').addEventListener('change', () => updateSeason());
-document.getElementById('episodeInput').addEventListener('change', () => updateEpisode());
+document.getElementById('seasonInput').addEventListener('change', () => {
+    updateSeason();
+    // Actualizar el texto con el nombre de la serie, temporada y episodio
+    displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
+});
 
+document.getElementById('episodeInput').addEventListener('change', () => {
+    updateEpisode();
+    // Actualizar el texto con el nombre de la serie, temporada y episodio
+    displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
+});
 let currentTmdbId = '';
 let currentSeason = 1;
 let currentEpisode = 1;
 
 function searchContent(query) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = av.env.API_KEY; // Leer la API Key desde ns.env
+    const apiKey = process.env.API_KEY;
     const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
 
     // Ocultar el cuadro del video anterior y limpiar el contenido
@@ -91,20 +102,21 @@ function displayResults(results) {
         poster.src = result.poster_path ? `https://image.tmdb.org/t/p/w200${result.poster_path}` : 'https://via.placeholder.com/100';
         poster.alt = result.title || result.name;
 
-        poster.dataset.tmdbId = result.id;
         poster.addEventListener('click', () => {
-            displayTmdbId(result.id);
-            currentTmdbId = result.id;
-            const type = document.getElementById('typeSelector').value;
-            if (type === 'tv') {
-                showEpisodeControls();
-                embedTvShow(result.id, 1, 1); // Temporada 1, Episodio 1
-            } else {
-                hideEpisodeControls();
-                embedMovie(result.id);
-            }
-        });
+		const type = document.getElementById('typeSelector').value;
+		currentTitle = result.title || result.name; // Guardar el título de la serie
+		currentTmdbId = result.id;
 
+		if (type === 'tv') {
+			showEpisodeControls();
+			embedTvShow(result.id, 1, 1); // Temporada 1, Episodio 1
+			displayTmdbId(result.id, currentTitle, type, 1, 1); // Mostrar nombre, temporada 1 y episodio 1
+		} else {
+			hideEpisodeControls();
+			embedMovie(result.id);
+			displayTmdbId(result.id, currentTitle, type); // Mostrar solo el nombre para películas
+		}
+	});
         resultItem.appendChild(poster);
         resultItem.appendChild(title);
         resultItem.appendChild(overview);
@@ -148,12 +160,14 @@ function embedTvShow(tmdbId, season, episode) {
     currentEpisode = episode;
     document.getElementById('seasonInput').value = season;
     document.getElementById('episodeInput').value = episode;
+	document.getElementById('episodeInput').value = currentEpisode;
+        
 }
 
 
 function fetchContentDetails(contentId) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = av.env.API_KEY; // Leer la API Key desde ns.env
+    const apiKey = process.env.API_KEY;
     const url = `https://api.themoviedb.org/3/${type}/${contentId}?api_key=${apiKey}`;
 
     return fetch(url)
@@ -167,11 +181,16 @@ function fetchContentDetails(contentId) {
         });
 }
 
-function displayTmdbId(tmdbId) {
-    const tmdbIdDisplay = document.getElementById('imdbIdDisplay');
-    tmdbIdDisplay.textContent = `TMDB ID: ${tmdbId}`;
-}
+let currentTitle = ''; // Variable para almacenar el título de la serie
 
+function displayTmdbId(tmdbId, title, type, season = null, episode = null) {
+    const tmdbIdDisplay = document.getElementById('imdbIdDisplay');
+    if (type === 'tv') {
+        tmdbIdDisplay.textContent = `Serie: ${title} - Temporada ${season}, Episodio ${episode}`;
+    } else {
+        tmdbIdDisplay.textContent = `Película: ${title}`;
+    }
+}
 function displayNoResults() {
     const resultsContainer = document.getElementById('results');
     resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
@@ -185,24 +204,32 @@ function hideEpisodeControls() {
     document.getElementById('episodeControls').style.display = 'none';
 }
 
+// En changeSeason
 function changeSeason(change) {
     const newSeason = currentSeason + change;
     if (newSeason >= 1) {
         currentSeason = newSeason;
-        currentEpisode = 1; // Reset episode to 1 when changing season
+        currentEpisode = 1; // Reiniciar el episodio al cambiar de temporada
         document.getElementById('seasonInput').value = currentSeason;
         document.getElementById('episodeInput').value = currentEpisode;
 
         embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+
+        // Actualizar el texto con el nombre de la serie, temporada y episodio
+        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
     }
 }
 
+// En changeEpisode
 function changeEpisode(change) {
     const newEpisode = currentEpisode + change;
     if (newEpisode >= 1) {
         currentEpisode = newEpisode;
         document.getElementById('episodeInput').value = currentEpisode;
         embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+
+        // Actualizar el texto con el nombre de la serie, temporada y episodio
+        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
     }
 }
 
@@ -210,10 +237,13 @@ function updateSeason() {
     const newSeason = parseInt(document.getElementById('seasonInput').value);
     if (newSeason >= 1) {
         currentSeason = newSeason;
-        currentEpisode = 1; // Reset episode to 1 when changing season
+        currentEpisode = 1; // Reiniciar el episodio al cambiar de temporada
         document.getElementById('episodeInput').value = currentEpisode;
 
         embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+
+        // Actualizar el texto con el nombre de la serie, temporada y episodio
+        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
     }
 }
 
@@ -223,5 +253,65 @@ function updateEpisode() {
         currentEpisode = newEpisode;
 
         embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+
+        // Actualizar el texto con el nombre de la serie, temporada y episodio
+        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
     }
 }
+
+
+//func
+// Función para actualizar el <h1>
+// Función para actualizar el <h1>
+async function actualizarTituloPagina() {
+    try {
+        const response = await fetch('https://api.quotable.io/random?tags=philosophy');
+        if (!response.ok) {
+            throw new Error('No se pudo obtener la frase');
+        }
+        const data = await response.json();
+        const titulo = `${data.content} - ${data.author}`;
+        document.querySelector('h1').textContent = titulo; // Actualizar el contenido del <h1>
+    } catch (error) {
+        console.error('Error al obtener la frase:', error);
+        document.querySelector('h1').textContent = "Buscador de Películas y Series"; // Texto predeterminado en caso de error
+    }
+}
+
+// Función para realizar la búsqueda
+async function searchContent(query) {
+    // Actualizar el <h1> con una nueva cita de filósofo
+    await actualizarTituloPagina();
+
+    const type = document.getElementById('typeSelector').value;
+    const apiKey = process.env.API_KEY;
+    const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
+
+    // Ocultar el cuadro del video anterior y limpiar el contenido
+    const playerContainer = document.getElementById('player');
+    playerContainer.style.display = 'none';
+    playerContainer.innerHTML = '';
+    document.getElementById('imdbIdDisplay').textContent = '';
+    hideEpisodeControls(); // Ocultar controles de episodios
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.results.length === 0) {
+                displayNoResults();
+            } else {
+                displayResults(data.results);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Actualizar el <h1> al cargar la página
+document.addEventListener('DOMContentLoaded', async () => {
+    await actualizarTituloPagina(); // Actualizar el contenido del <h1>
+});
