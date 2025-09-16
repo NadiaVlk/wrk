@@ -2,7 +2,8 @@
 //--- CONSTANTES Y VARIABLES GLOBALES ---
 //======================================================================
 
-const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
+// En app.js, reemplaza la vieja constante "apiKey"
+const apiKey = TMDB_API_KEY; // Usa la variable global del archivo config.js
 let currentTmdbId = '';
 let currentTitle = '';
 let currentSeason = 1;
@@ -397,6 +398,7 @@ function createParticles() {
         particlesContainer.appendChild(particle);
     }
 }
+
 
 
 
