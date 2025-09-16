@@ -126,8 +126,8 @@ button:hover {
 
 #player {
     position: relative;
-    width: 90%;
-    max-width: 800px;
+    width: 50%;
+    max-width: 400px;
     margin: 20px auto;
     padding-top: 26.625%; /* Proporción 16:9 */
     display: none;
@@ -138,8 +138,8 @@ button:hover {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 50%;
+    height: 50%;
 }
 
 #episodeControls {
@@ -164,4 +164,5 @@ button:hover {
 #playNextButton {
     background-color: #28a745; /* Color verde distintivo */
 }
+
 
