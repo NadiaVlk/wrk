@@ -31,7 +31,6 @@ function setupEventListeners() {
     document.getElementById('prevSeason').addEventListener('click', () => changeSeason(-1));
     document.getElementById('nextSeason').addEventListener('click', () => changeSeason(1));
     document.getElementById('prevEpisode').addEventListener('click', () => changeEpisode(-1));
-    document.getElementById('nextEpisode').addEventListener('click', () => changeEpisode(1));
     
     document.getElementById('seasonInput').addEventListener('change', updateSeason);
     document.getElementById('episodeInput').addEventListener('change', updateEpisode);
@@ -354,4 +353,5 @@ function createParticles() {
         particlesContainer.appendChild(particle);
     }
 }
+
 
