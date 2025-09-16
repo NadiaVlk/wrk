@@ -1,168 +1,42 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* Add these new styles to your styles.css file */
 
-body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    color: white;
-    min-height: 100vh;
-}
-
-#particles {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.particle {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 50%;
-    animation: float 5s infinite ease-in-out;
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(0) translateX(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-100vh) translateX(100vw);
-        opacity: 0;
-    }
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-#searchContainer {
+#main-content {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-#searchInput {
-    width: 300px;
-    padding: 10px;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background-color: #333;
-    color: white;
-}
-
-button, #typeSelector {
-    padding: 10px 20px;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #007bff;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
-#typeSelector {
-    background-color: #333;
-    border: 1px solid #555;
-}
-
-#results {
+    gap: 30px; /* Space between the two columns */
     margin-top: 20px;
+    align-items: flex-start; /* Aligns items to the top */
+}
+
+#left-column {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column; /* Stacks the controls vertically */
     gap: 20px;
-    justify-content: center;
+    max-width: 400px; /* Prevents the left column from being too wide */
+    flex: 1; /* Allows the column to take up available space */
 }
 
-.result-item {
-    text-align: center;
-    flex: 0 1 200px; /* Ancho fijo para los items */
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: transform 0.2s;
+#right-column {
+    flex: 2; /* Makes the right column wider */
+    max-width: 800px;
 }
 
-.result-item:hover {
-    transform: scale(1.05);
-}
-
-.result-item img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.result-item h2 {
-    font-size: 16px;
-    margin: 10px 0 5px;
-}
-
-#imdbIdDisplay {
-    text-align: center;
-    margin: 20px 0;
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
+/* MODIFIED: Remove auto margin from the player */
 #player {
     position: relative;
-    width: 50%;
-    max-width: 400px;
-    margin: 20px auto;
-    padding-top: 26.625%; /* Proporción 16:9 */
-    display: none;
+    width: 100%; /* Make player fill the right column */
+    padding-top: 56.25%; /* Aspect ratio 16:9 */
     background-color: #000;
-}
-
-#player iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 50%;
-    height: 50%;
+    /* margin: 20px auto;  <-- This line is removed or commented out */
 }
 
 #episodeControls {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 20px;
+    /* Ensures controls stack nicely in the left column */
+    flex-direction: column;
+    align-items: stretch; /* Makes buttons fill the width */
 }
 
 #episodeControls input[type="number"] {
-    width: 60px;
-    padding: 8px;
-    text-align: center;
-    background-color: #333;
-    color: white;
-    border: 1px solid #555;
-    border-radius: 4px;
+    /* Adjust input width for the new layout */
+    width: auto;
 }
-
-#playNextButton {
-    background-color: #28a745; /* Color verde distintivo */
-}
-
-
