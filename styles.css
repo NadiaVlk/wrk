@@ -1,52 +1,18 @@
-/* Add these new styles to your styles.css file */
-
-#main-content {
-    display: flex;
-    justify-content: center;
-    gap: 30px; /* Space between the two columns */
-    margin-top: 20px;
-    align-items: flex-start; /* Aligns items to the top */
-}
-
-#left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    /* MODIFICADO: Le damos una proporción de 1 */
-    flex: 1; 
-    /* MODIFICADO: Aumentamos el ancho máximo por si la pantalla es muy grande */
-    max-width: 450px; 
-}
-
-#right-column {
-    /* MODIFICADO: Le damos una proporción de 3, haciéndola 3 veces más ancha que la izquierda */
-    flex: 3; 
-    /* MODIFICADO: Quitamos el max-width para que pueda crecer libremente */
-}
-
-
-
-#episodeControls {
-    /* Ensures controls stack nicely in the left column */
-    flex-direction: column;
-    align-items: stretch; /* Makes buttons fill the width */
-}
-
-#episodeControls input[type="number"] {
-    /* Adjust input width for the new layout */
-    width: auto;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    /* El degradado NO va aquí, solo un color de base */
-    background-color: #0f0c29; 
+    background-color: #0f0c29;
     color: white;
     min-height: 100vh;
 }
 
-/* Esta capa crea el fondo degradado y se va hasta atrás */
 body::before {
     content: '';
     position: fixed;
@@ -55,16 +21,172 @@ body::before {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    z-index: -2; 
+    z-index: -2;
 }
 
-/* Las partículas se ponen encima del fondo, pero debajo del contenido */
 #particles {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; 
+    z-index: -1;
     pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    animation: float 5s infinite ease-in-out;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100vw);
+        opacity: 0;
+    }
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#searchContainer {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+}
+
+button, #typeSelector {
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007bff;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+#typeSelector {
+    background-color: #333;
+    border: 1px solid #555;
+}
+
+#results {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.result-item {
+    text-align: center;
+    flex: 0 1 200px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.result-item:hover {
+    transform: scale(1.05);
+}
+
+.result-item img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.result-item h2 {
+    font-size: 16px;
+    margin: 10px 0 5px;
+}
+
+#imdbIdDisplay {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#main-content {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    align-items: flex-start;
+}
+
+#left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    max-width: 450px;
+}
+
+#right-column {
+    flex: 3;
+}
+
+#player {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    background-color: #000;
+}
+
+#player iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#episodeControls {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+#episodeControls input[type="number"] {
+    width: auto;
+    padding: 8px;
+    text-align: center;
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+#playNextButton {
+    background-color: #28a745;
 }
