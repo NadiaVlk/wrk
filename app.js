@@ -228,6 +228,7 @@ function displayResults(results) {
     resultsContainer.innerHTML = '';
 
     results.forEach(result => {
+        // ... (el código para crear resultItem, poster, title sigue igual)
         const resultItem = document.createElement('div');
         resultItem.classList.add('result-item');
 
@@ -238,17 +239,31 @@ function displayResults(results) {
         const title = document.createElement('h2');
         title.textContent = result.title || result.name;
 
+        // MODIFICADO: El event listener del póster
         poster.addEventListener('click', async () => {
             const type = document.getElementById('typeSelector').value;
             currentTitle = result.title || result.name;
             currentTmdbId = result.id;
 
-            resultsContainer.innerHTML = ''; // Limpiar resultados al seleccionar uno
+            resultsContainer.innerHTML = ''; 
 
             if (type === 'tv') {
                 await fetchTvShowDetails(result.id);
+                
+                // NUEVO: Lógica para cargar el progreso
+                const savedProgress = loadProgress(result.id);
+                let startSeason = 1;
+                let startEpisode = 1;
+
+                if (savedProgress) {
+                    console.log(`Continuando desde S${savedProgress.season}E${savedProgress.episode}`);
+                    startSeason = savedProgress.season;
+                    startEpisode = savedProgress.episode;
+                }
+                
                 showEpisodeControls();
-                embedTvShow(result.id, 1, 1);
+                embedTvShow(result.id, startSeason, startEpisode); // Usamos las variables de inicio
+
             } else {
                 hideEpisodeControls();
                 embedMovie(result.id);
@@ -292,6 +307,9 @@ function embedTvShow(tmdbId, season, episode) {
     document.getElementById('episodeInput').value = episode;
 
     displayContentTitle(currentTitle, season, episode);
+
+    // NUEVO: Guardar el progreso cada vez que se carga un episodio.
+    saveProgress(tmdbId, season, episode, currentTitle);
 }
 
 /**
@@ -337,6 +355,32 @@ function resetPlayerAndResults() {
 }
 
 /**
+ * Guarda el progreso de una serie en localStorage.
+ * @param {string} tmdbId - El ID de la serie.
+ * @param {number} season - La temporada actual.
+ * @param {number} episode - El episodio actual.
+ * @param {string} title - El título de la serie.
+ */
+function saveProgress(tmdbId, season, episode, title) {
+    // Obtenemos el historial existente o creamos un objeto vacío
+    const history = JSON.parse(localStorage.getItem('watchingHistory')) || {};
+    // Actualizamos la entrada para esta serie
+    history[tmdbId] = { season, episode, title };
+    // Guardamos el historial actualizado
+    localStorage.setItem('watchingHistory', JSON.stringify(history));
+}
+
+/**
+ * Carga el progreso de una serie desde localStorage.
+ * @param {string} tmdbId - El ID de la serie.
+ * @returns {object|null} - El objeto con el progreso o null si no existe.
+ */
+function loadProgress(tmdbId) {
+    const history = JSON.parse(localStorage.getItem('watchingHistory')) || {};
+    return history[tmdbId] || null;
+}
+
+/**
  * Crea las partículas animadas del fondo.
  */
 function createParticles() {
@@ -353,5 +397,6 @@ function createParticles() {
         particlesContainer.appendChild(particle);
     }
 }
+
 
 
