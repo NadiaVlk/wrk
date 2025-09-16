@@ -10,15 +10,18 @@
 
 #left-column {
     display: flex;
-    flex-direction: column; /* Stacks the controls vertically */
+    flex-direction: column;
     gap: 20px;
-    max-width: 400px; /* Prevents the left column from being too wide */
-    flex: 1; /* Allows the column to take up available space */
+    /* MODIFICADO: Le damos una proporción de 1 */
+    flex: 1; 
+    /* MODIFICADO: Aumentamos el ancho máximo por si la pantalla es muy grande */
+    max-width: 450px; 
 }
 
 #right-column {
-    flex: 2; /* Makes the right column wider */
-    max-width: 800px;
+    /* MODIFICADO: Le damos una proporción de 3, haciéndola 3 veces más ancha que la izquierda */
+    flex: 3; 
+    /* MODIFICADO: Quitamos el max-width para que pueda crecer libremente */
 }
 
 /* MODIFIED: Remove auto margin from the player */
@@ -65,3 +68,4 @@ body::before {
     z-index: -1; /* Se posiciona encima del fondo, pero debajo del contenido */
     pointer-events: none;
 }
+
