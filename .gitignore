@@ -1,0 +1,6 @@
+# Ignorar el archivo de configuración con la clave de API
+config.js
+
+# También es buena práctica ignorar otras cosas, como:
+node_modules/
+.env
