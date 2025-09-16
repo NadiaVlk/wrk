@@ -22,12 +22,13 @@
 }
 
 /* MODIFIED: Remove auto margin from the player */
-#player {
-    position: relative;
-    width: 100%; /* Make player fill the right column */
-    padding-top: 56.25%; /* Aspect ratio 16:9 */
-    background-color: #000;
-    /* margin: 20px auto;  <-- This line is removed or commented out */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    /* MODIFICADO: Quita el degradado de aquí y deja un color base */
+    background-color: #0f0c29; 
+    color: white;
+    min-height: 100vh;
 }
 
 #episodeControls {
@@ -39,4 +40,28 @@
 #episodeControls input[type="number"] {
     /* Adjust input width for the new layout */
     width: auto;
+}
+
+/* NUEVO: Añade este bloque a tu CSS */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Ponemos el degradado en esta nueva capa */
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    z-index: -2; /* Lo enviamos totalmente al fondo */
+}
+
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* MODIFICADO: Ajustamos el z-index */
+    z-index: -1; /* Se posiciona encima del fondo, pero debajo del contenido */
+    pointer-events: none;
 }
