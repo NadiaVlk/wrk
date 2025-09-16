@@ -24,15 +24,7 @@
     /* MODIFICADO: Quitamos el max-width para que pueda crecer libremente */
 }
 
-/* MODIFIED: Remove auto margin from the player */
-body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    /* MODIFICADO: Quita el degradado de aquí y deja un color base */
-    background-color: #0f0c29; 
-    color: white;
-    min-height: 100vh;
-}
+
 
 #episodeControls {
     /* Ensures controls stack nicely in the left column */
@@ -45,7 +37,16 @@ body {
     width: auto;
 }
 
-/* NUEVO: Añade este bloque a tu CSS */
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    /* El degradado NO va aquí, solo un color de base */
+    background-color: #0f0c29; 
+    color: white;
+    min-height: 100vh;
+}
+
+/* Esta capa crea el fondo degradado y se va hasta atrás */
 body::before {
     content: '';
     position: fixed;
@@ -53,19 +54,17 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    /* Ponemos el degradado en esta nueva capa */
     background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    z-index: -2; /* Lo enviamos totalmente al fondo */
+    z-index: -2; 
 }
 
+/* Las partículas se ponen encima del fondo, pero debajo del contenido */
 #particles {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* MODIFICADO: Ajustamos el z-index */
-    z-index: -1; /* Se posiciona encima del fondo, pero debajo del contenido */
+    z-index: -1; 
     pointer-events: none;
 }
-
