@@ -283,7 +283,7 @@ function embedMovie(tmdbId) {
 function embedTvShow(tmdbId, season, episode) {
     const embedUrl = `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`;
     const playerContainer = document.getElementById('player');
-    playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
+    playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allow="autoplay" allowfullscreen></iframe>`;
     playerContainer.style.display = 'block';
     
     // Actualiza el estado global y los inputs
@@ -354,3 +354,4 @@ function createParticles() {
         particlesContainer.appendChild(particle);
     }
 }
+
