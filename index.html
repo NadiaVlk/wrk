@@ -11,31 +11,36 @@
 
     <h1>Buscador de Películas y Series</h1>
     
-    <div id="searchContainer">
-        <input type="text" id="searchInput" placeholder="Buscar películas o series...">
-        <select id="typeSelector">
-            <option value="movie">Películas</option>
-            <option value="tv">Series</option>
-        </select>
-        <button id="searchButton">Buscar</button>
-    </div>
-
-    <div id="imdbIdDisplay"></div>
-
-    <div id="player" style="display: none;"></div>
-    
-    <div id="episodeControls" style="display: none;">
-        <button id="prevSeason">Temporada Anterior</button>
-        <input type="number" id="seasonInput" value="1" min="1">
-        <button id="nextSeason">Siguiente Temporada</button>
-        <button id="prevEpisode">Episodio Anterior</button>
-        <input type="number" id="episodeInput" value="1" min="1">
-        <button id="playNextButton">Siguiente Episodio ▶</button>
-    </div>
-    
     <div id="results"></div>
+
+    <div id="main-content">
+
+        <div id="left-column">
+            <div id="searchContainer">
+                <input type="text" id="searchInput" placeholder="Buscar películas o series...">
+                <select id="typeSelector">
+                    <option value="movie">Películas</option>
+                    <option value="tv">Series</option>
+                </select>
+                <button id="searchButton">Buscar</button>
+            </div>
+            <div id="imdbIdDisplay"></div>
+            <div id="episodeControls" style="display: none;">
+                <button id="prevSeason">Temporada Anterior</button>
+                <input type="number" id="seasonInput" value="1" min="1">
+                <button id="nextSeason">Siguiente Temporada</button>
+                <button id="prevEpisode">Episodio Anterior</button>
+                <input type="number" id="episodeInput" value="1" min="1">
+                <button id="playNextButton">Siguiente Episodio ▶</button>
+            </div>
+        </div>
+
+        <div id="right-column">
+            <div id="player" style="display: none;"></div>
+        </div>
+
+    </div>
     
     <script src="app.js"></script>
 </body>
 </html>
-
