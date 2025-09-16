@@ -1,18 +1,17 @@
 html, body {
-    height: 100%; /* Asegura que el body y html ocupen toda la altura */
-    margin: 0; /* Elimina el margen predeterminado */
-    padding: 0; /* Elimina el padding predeterminado */
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); /* Degradado oscuro */
-    color: white; /* Texto blanco para contrastar con el fondo oscuro */
-    min-height: 100vh; /* Asegura que el body ocupe al menos toda la altura de la ventana */
-	margin: 0;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: white;
+    min-height: 100vh;
 }
-
 
 #particles {
     position: fixed;
@@ -20,16 +19,15 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Coloca las partículas detrás del contenido */
-    pointer-events: none; /* Permite interactuar con el contenido de la página */
+    z-index: -1;
+    pointer-events: none;
 }
-
 
 .particle {
     position: absolute;
     width: 2px;
     height: 2px;
-    background-color: rgba(255, 255, 255, 0.7); /* Color de las partículas */
+    background-color: rgba(255, 255, 255, 0.7);
     border-radius: 50%;
     animation: float 5s infinite ease-in-out;
 }
@@ -45,11 +43,17 @@ body {
     }
 }
 
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
 #searchContainer {
-    margin-bottom: 20px;
     display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 10px;
-    align-items: center;
+    margin-bottom: 20px;
 }
 
 #searchInput {
@@ -61,25 +65,22 @@ body {
     color: white;
 }
 
-#searchButton {
+button, #typeSelector {
     padding: 10px 20px;
-    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    background-color: #007bff;
 }
 
-#searchButton:hover {
-    background-color: #0056b3;
+button:hover {
+    opacity: 0.8;
 }
 
 #typeSelector {
-    padding: 10px;
-    border: 1px solid #555;
-    border-radius: 4px;
     background-color: #333;
-    color: white;
+    border: 1px solid #555;
 }
 
 #results {
@@ -87,17 +88,22 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: center;
 }
 
 .result-item {
     text-align: center;
-    flex: 1 1 150px;
-    max-width: 150px;
-    background-color: rgba(255, 255, 255, 0.1); /* Fondo semi-transparente */
+    flex: 0 1 200px; /* Ancho fijo para los items */
+    background-color: rgba(255, 255, 255, 0.05);
     padding: 10px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.result-item:hover {
+    transform: scale(1.05);
 }
 
 .result-item img {
@@ -111,32 +117,50 @@ body {
     margin: 10px 0 5px;
 }
 
-.result-item p {
-    font-size: 14px;
-    color: #ccc;
+#imdbIdDisplay {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 #player {
-    width: 800px;
-    height: 450px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #555;
-    box-sizing: border-box;
+    position: relative;
+    width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding-top: 50.625%; /* Proporción 16:9 */
     display: none;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    background-color: #000;
+}
+
+#player iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 #episodeControls {
     display: none;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
     margin-top: 20px;
 }
 
-#imdbIdDisplay {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #ccc;
+#episodeControls input[type="number"] {
+    width: 60px;
+    padding: 8px;
+    text-align: center;
+    background-color: #333;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+#playNextButton {
+    background-color: #28a745; /* Color verde distintivo */
 }
