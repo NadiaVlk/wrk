@@ -1,74 +1,96 @@
+//======================================================================
+//--- CONSTANTES Y VARIABLES GLOBALES ---
+//======================================================================
 
-document.getElementById('searchButton').addEventListener('click', () => {
+const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
+let currentTmdbId = '';
+let currentTitle = '';
+let currentSeason = 1;
+let currentEpisode = 1;
+let currentTotalSeasons = 0;
+
+
+//======================================================================
+//--- INICIALIZACIÓN Y EVENT LISTENERS ---
+//======================================================================
+
+/**
+ * Se ejecuta cuando el contenido del DOM ha sido cargado.
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+});
+
+/**
+ * Configura los event listeners para los elementos de la UI.
+ */
+function setupEventListeners() {
+    document.getElementById('searchButton').addEventListener('click', handleSearch);
+    document.getElementById('searchInput').addEventListener('keypress', handleKeyPressSearch);
+    
+    document.getElementById('prevSeason').addEventListener('click', () => changeSeason(-1));
+    document.getElementById('nextSeason').addEventListener('click', () => changeSeason(1));
+    document.getElementById('prevEpisode').addEventListener('click', () => changeEpisode(-1));
+    document.getElementById('nextEpisode').addEventListener('click', () => changeEpisode(1));
+    
+    document.getElementById('seasonInput').addEventListener('change', updateSeason);
+    document.getElementById('episodeInput').addEventListener('change', updateEpisode);
+
+    document.getElementById('playNextButton').addEventListener('click', playNext);
+}
+
+/**
+ * Función principal de inicialización de la aplicación.
+ */
+function initializeApp() {
+    createParticles();
+    actualizarTituloPagina();
+    setupEventListeners();
+}
+
+
+//======================================================================
+//--- MANEJADORES DE EVENTOS (Handlers) ---
+//======================================================================
+
+/**
+ * Maneja el evento de clic en el botón de búsqueda.
+ */
+function handleSearch() {
     const query = document.getElementById('searchInput').value;
     if (query) {
         searchContent(query);
     }
-});
+}
 
-document.getElementById('searchInput').addEventListener('keypress', (event) => {
+/**
+ * Maneja el evento de presionar 'Enter' en el campo de búsqueda.
+ */
+function handleKeyPressSearch(event) {
     if (event.key === 'Enter') {
-        const query = document.getElementById('searchInput').value;
-        if (query) {
-            searchContent(query);
-
-        }
+        handleSearch();
     }
-});
+}
 
 
-document.addEventListener('DOMContentLoaded', () => {
-    const particlesContainer = document.getElementById('particles');
-    const numParticles = 100; // Número de partículas
+//======================================================================
+//--- FUNCIONES DE LA API (FETCH) ---
+//======================================================================
 
-    for (let i = 0; i < numParticles; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        particle.style.left = `${Math.random() * 100}vw`; // Posición horizontal aleatoria
-        particle.style.top = `${Math.random() * 100}vh`; // Posición vertical aleatoria
-        particle.style.animationDuration = `${Math.random() * 5 + 3}s`; // Duración aleatoria
-        particle.style.animationDelay = `${Math.random() * 2}s`; // Retraso aleatorio
-        particlesContainer.appendChild(particle);
-    }
-});
-
-document.getElementById('prevSeason').addEventListener('click', () => changeSeason(-1));
-document.getElementById('nextSeason').addEventListener('click', () => changeSeason(1));
-document.getElementById('prevEpisode').addEventListener('click', () => changeEpisode(-1));
-document.getElementById('nextEpisode').addEventListener('click', () => changeEpisode(1));
-
-document.getElementById('seasonInput').addEventListener('change', () => {
-    updateSeason();
-    // Actualizar el texto con el nombre de la serie, temporada y episodio
-    displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
-});
-
-document.getElementById('episodeInput').addEventListener('change', () => {
-    updateEpisode();
-    // Actualizar el texto con el nombre de la serie, temporada y episodio
-    displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
-});
-let currentTmdbId = '';
-let currentSeason = 1;
-let currentEpisode = 1;
-
+/**
+ * Busca películas o series usando la API de TMDB.
+ * @param {string} query - El término de búsqueda.
+ */
 function searchContent(query) {
     const type = document.getElementById('typeSelector').value;
-    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
     const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
 
-    // Ocultar el cuadro del video anterior y limpiar el contenido
-    const playerContainer = document.getElementById('player');
-    playerContainer.style.display = 'none';
-    playerContainer.innerHTML = '';
-    document.getElementById('imdbIdDisplay').textContent = '';
-    hideEpisodeControls(); // Ocultar controles de episodios
+    // Limpia la UI antes de una nueva búsqueda
+    resetPlayerAndResults();
 
     fetch(url)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
         })
         .then(data => {
@@ -78,10 +100,130 @@ function searchContent(query) {
                 displayResults(data.results);
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error('Error en la búsqueda:', error));
+}
+
+/**
+ * Obtiene los detalles de una serie para saber el número total de temporadas.
+ * @param {string} tmdbId - El ID de la serie en TMDB.
+ */
+function fetchTvShowDetails(tmdbId) {
+    const url = `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}`;
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            currentTotalSeasons = data.number_of_seasons;
+        })
+        .catch(error => console.error('Error al obtener detalles de la serie:', error));
+}
+
+/**
+ * Actualiza el título H1 de la página con una cita filosófica.
+ */
+async function actualizarTituloPagina() {
+    try {
+        const response = await fetch('https://api.quotable.io/random?tags=philosophy');
+        if (!response.ok) throw new Error('No se pudo obtener la frase');
+        const data = await response.json();
+        document.querySelector('h1').textContent = `${data.content} - ${data.author}`;
+    } catch (error) {
+        console.error('Error al obtener la frase:', error);
+        document.querySelector('h1').textContent = "Buscador de Películas y Series";
+    }
 }
 
 
+//======================================================================
+//--- LÓGICA DE NAVEGACIÓN DE EPISODIOS ---
+//======================================================================
+
+/**
+ * Reproduce el siguiente episodio de la serie.
+ */
+function playNext() {
+    if (!currentTmdbId) return;
+
+    const seasonDetailsUrl = `https://api.themoviedb.org/3/tv/${currentTmdbId}/season/${currentSeason}?api_key=${apiKey}`;
+
+    fetch(seasonDetailsUrl)
+        .then(response => response.json())
+        .then(data => {
+            const episodesInSeason = data.episodes.length;
+
+            if (currentEpisode < episodesInSeason) {
+                // Hay más episodios en la temporada actual
+                currentEpisode++;
+                embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+            } else if (currentSeason < currentTotalSeasons) {
+                // Es el último episodio, pero hay más temporadas
+                currentSeason++;
+                currentEpisode = 1;
+                embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+            } else {
+                // Es el último episodio de la última temporada
+                alert("¡Felicidades! Has terminado la serie.");
+            }
+        })
+        .catch(error => console.error('Error al obtener detalles de la temporada:', error));
+}
+
+/**
+ * Cambia la temporada actual.
+ * @param {number} change - El cambio a aplicar (+1 o -1).
+ */
+function changeSeason(change) {
+    const newSeason = currentSeason + change;
+    if (newSeason >= 1 && newSeason <= currentTotalSeasons) {
+        currentSeason = newSeason;
+        currentEpisode = 1; // Reiniciar al primer episodio
+        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+    }
+}
+
+/**
+ * Cambia el episodio actual.
+ * @param {number} change - El cambio a aplicar (+1 o -1).
+ */
+function changeEpisode(change) {
+    const newEpisode = currentEpisode + change;
+    if (newEpisode >= 1) { // No hay límite superior aquí, playNext se encargará
+        currentEpisode = newEpisode;
+        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+    }
+}
+
+/**
+ * Actualiza la temporada desde el input numérico.
+ */
+function updateSeason() {
+    const newSeason = parseInt(document.getElementById('seasonInput').value, 10);
+    if (newSeason >= 1 && newSeason <= currentTotalSeasons) {
+        currentSeason = newSeason;
+        currentEpisode = 1;
+        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+    }
+}
+
+/**
+ * Actualiza el episodio desde el input numérico.
+ */
+function updateEpisode() {
+    const newEpisode = parseInt(document.getElementById('episodeInput').value, 10);
+    if (newEpisode >= 1) {
+        currentEpisode = newEpisode;
+        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
+    }
+}
+
+
+//======================================================================
+//--- MANIPULACIÓN DEL DOM Y UI ---
+//======================================================================
+
+/**
+ * Muestra los resultados de la búsqueda en la página.
+ * @param {Array} results - Un array de resultados de la API.
+ */
 function displayResults(results) {
     const resultsContainer = document.getElementById('results');
     resultsContainer.innerHTML = '';
@@ -90,110 +232,84 @@ function displayResults(results) {
         const resultItem = document.createElement('div');
         resultItem.classList.add('result-item');
 
+        const poster = document.createElement('img');
+        poster.src = result.poster_path ? `https://image.tmdb.org/t/p/w200${result.poster_path}` : 'https://via.placeholder.com/200x300';
+        poster.alt = result.title || result.name;
+
         const title = document.createElement('h2');
         title.textContent = result.title || result.name;
 
-        const overview = document.createElement('p');
-        overview.textContent = result.overview;
+        poster.addEventListener('click', async () => {
+            const type = document.getElementById('typeSelector').value;
+            currentTitle = result.title || result.name;
+            currentTmdbId = result.id;
 
-        const poster = document.createElement('img');
-        poster.src = result.poster_path ? `https://image.tmdb.org/t/p/w200${result.poster_path}` : 'https://via.placeholder.com/100';
-        poster.alt = result.title || result.name;
+            resultsContainer.innerHTML = ''; // Limpiar resultados al seleccionar uno
 
-        poster.addEventListener('click', () => {
-		const type = document.getElementById('typeSelector').value;
-		currentTitle = result.title || result.name; // Guardar el título de la serie
-		currentTmdbId = result.id;
+            if (type === 'tv') {
+                await fetchTvShowDetails(result.id);
+                showEpisodeControls();
+                embedTvShow(result.id, 1, 1);
+            } else {
+                hideEpisodeControls();
+                embedMovie(result.id);
+            }
+        });
 
-		if (type === 'tv') {
-			showEpisodeControls();
-			embedTvShow(result.id, 1, 1); // Temporada 1, Episodio 1
-			displayTmdbId(result.id, currentTitle, type, 1, 1); // Mostrar nombre, temporada 1 y episodio 1
-		} else {
-			hideEpisodeControls();
-			embedMovie(result.id);
-			displayTmdbId(result.id, currentTitle, type); // Mostrar solo el nombre para películas
-		}
-	});
         resultItem.appendChild(poster);
         resultItem.appendChild(title);
-        resultItem.appendChild(overview);
         resultsContainer.appendChild(resultItem);
     });
 }
 
+/**
+ * Incrusta el reproductor para una película.
+ * @param {string} tmdbId - El ID de la película en TMDB.
+ */
 function embedMovie(tmdbId) {
-    fetchContentDetails(tmdbId).then(imdbId => {
-        if (imdbId) {
-            const embedUrl = `https://vidsrc.to/embed/movie/${imdbId}`;
-            const playerContainer = document.getElementById('player');
-            playerContainer.innerHTML = `<iframe src="${embedUrl}" width="800" height="450" frameborder="0" allowfullscreen></iframe>`;
-            playerContainer.style.display = 'block';
-
-            const resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = '';
-
-            const searchContainer = document.getElementById('searchContainer');
-            searchContainer.appendChild(playerContainer);
-        } else {
-            console.error('No se pudo obtener el ID de IMDb.');
-        }
-    });
+    const embedUrl = `https://vidsrc.to/embed/movie/${tmdbId}`;
+    const playerContainer = document.getElementById('player');
+    playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
+    playerContainer.style.display = 'block';
+    displayContentTitle(currentTitle);
 }
 
+/**
+ * Incrusta el reproductor para una serie.
+ * @param {string} tmdbId - El ID de la serie.
+ * @param {number} season - El número de temporada.
+ * @param {number} episode - El número de episodio.
+ */
 function embedTvShow(tmdbId, season, episode) {
     const embedUrl = `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`;
     const playerContainer = document.getElementById('player');
-    playerContainer.innerHTML = `<iframe src="${embedUrl}" width="800" height="450" frameborder="0" allowfullscreen></iframe>`;
+    playerContainer.innerHTML = `<iframe src="${embedUrl}" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>`;
     playerContainer.style.display = 'block';
-
-    const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = '';
-
-    const searchContainer = document.getElementById('searchContainer');
-    searchContainer.appendChild(playerContainer);
-
-    // Actualizar la temporada y episodio actuales
+    
+    // Actualiza el estado global y los inputs
     currentSeason = season;
     currentEpisode = episode;
     document.getElementById('seasonInput').value = season;
     document.getElementById('episodeInput').value = episode;
-	document.getElementById('episodeInput').value = currentEpisode;
-        
+
+    displayContentTitle(currentTitle, season, episode);
 }
 
-
-function fetchContentDetails(contentId) {
-    const type = document.getElementById('typeSelector').value;
-    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
-    const url = `https://api.themoviedb.org/3/${type}/${contentId}?api_key=${apiKey}`;
-
-    return fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            return data.imdb_id ? data.imdb_id : null;
-        })
-        .catch(error => {
-            console.error('Error fetching content details:', error);
-            return null;
-        });
-}
-
-let currentTitle = ''; // Variable para almacenar el título de la serie
-
-function displayTmdbId(tmdbId, title, type, season = null, episode = null) {
-    const tmdbIdDisplay = document.getElementById('imdbIdDisplay');
-    if (type === 'tv') {
-        tmdbIdDisplay.textContent = `Serie: ${title} - Temporada ${season}, Episodio ${episode}`;
+/**
+ * Muestra el título del contenido que se está reproduciendo.
+ */
+function displayContentTitle(title, season = null, episode = null) {
+    const displayElement = document.getElementById('imdbIdDisplay');
+    if (season && episode) {
+        displayElement.textContent = `Viendo: ${title} - T${season}:E${episode}`;
     } else {
-        tmdbIdDisplay.textContent = `Película: ${title}`;
+        displayElement.textContent = `Viendo: ${title}`;
     }
 }
-function displayNoResults() {
-    const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = '<p>No se encontraron resultados.</p>';
-}
 
+/**
+ * Muestra u oculta los controles de episodios.
+ */
 function showEpisodeControls() {
     document.getElementById('episodeControls').style.display = 'flex';
 }
@@ -202,114 +318,39 @@ function hideEpisodeControls() {
     document.getElementById('episodeControls').style.display = 'none';
 }
 
-// En changeSeason
-function changeSeason(change) {
-    const newSeason = currentSeason + change;
-    if (newSeason >= 1) {
-        currentSeason = newSeason;
-        currentEpisode = 1; // Reiniciar el episodio al cambiar de temporada
-        document.getElementById('seasonInput').value = currentSeason;
-        document.getElementById('episodeInput').value = currentEpisode;
-
-        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
-
-        // Actualizar el texto con el nombre de la serie, temporada y episodio
-        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
-    }
+/**
+ * Muestra un mensaje de que no se encontraron resultados.
+ */
+function displayNoResults() {
+    document.getElementById('results').innerHTML = '<p>No se encontraron resultados.</p>';
 }
 
-// En changeEpisode
-function changeEpisode(change) {
-    const newEpisode = currentEpisode + change;
-    if (newEpisode >= 1) {
-        currentEpisode = newEpisode;
-        document.getElementById('episodeInput').value = currentEpisode;
-        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
-
-        // Actualizar el texto con el nombre de la serie, temporada y episodio
-        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
-    }
-}
-
-function updateSeason() {
-    const newSeason = parseInt(document.getElementById('seasonInput').value);
-    if (newSeason >= 1) {
-        currentSeason = newSeason;
-        currentEpisode = 1; // Reiniciar el episodio al cambiar de temporada
-        document.getElementById('episodeInput').value = currentEpisode;
-
-        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
-
-        // Actualizar el texto con el nombre de la serie, temporada y episodio
-        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
-    }
-}
-
-function updateEpisode() {
-    const newEpisode = parseInt(document.getElementById('episodeInput').value);
-    if (newEpisode >= 1) {
-        currentEpisode = newEpisode;
-
-        embedTvShow(currentTmdbId, currentSeason, currentEpisode);
-
-        // Actualizar el texto con el nombre de la serie, temporada y episodio
-        displayTmdbId(currentTmdbId, currentTitle, 'tv', currentSeason, currentEpisode);
-    }
-}
-
-
-//func
-// Función para actualizar el <h1>
-// Función para actualizar el <h1>
-async function actualizarTituloPagina() {
-    try {
-        const response = await fetch('https://api.quotable.io/random?tags=philosophy');
-        if (!response.ok) {
-            throw new Error('No se pudo obtener la frase');
-        }
-        const data = await response.json();
-        const titulo = `${data.content} - ${data.author}`;
-        document.querySelector('h1').textContent = titulo; // Actualizar el contenido del <h1>
-    } catch (error) {
-        console.error('Error al obtener la frase:', error);
-        document.querySelector('h1').textContent = "Buscador de Películas y Series"; // Texto predeterminado en caso de error
-    }
-}
-
-// Función para realizar la búsqueda
-async function searchContent(query) {
-    // Actualizar el <h1> con una nueva cita de filósofo
-    await actualizarTituloPagina();
-
-    const type = document.getElementById('typeSelector').value;
-    const apiKey = 'e2e05b26a02be183714d56f9ad0d0900';
-    const url = `https://api.themoviedb.org/3/search/${type}?api_key=${apiKey}&query=${encodeURIComponent(query)}`;
-
-    // Ocultar el cuadro del video anterior y limpiar el contenido
+/**
+ * Limpia el reproductor y los resultados, útil para nuevas búsquedas.
+ */
+function resetPlayerAndResults() {
     const playerContainer = document.getElementById('player');
     playerContainer.style.display = 'none';
     playerContainer.innerHTML = '';
+    document.getElementById('results').innerHTML = '';
     document.getElementById('imdbIdDisplay').textContent = '';
-    hideEpisodeControls(); // Ocultar controles de episodios
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.results.length === 0) {
-                displayNoResults();
-            } else {
-                displayResults(data.results);
-            }
-        })
-        .catch(error => console.error('Error:', error));
+    hideEpisodeControls();
 }
 
-// Actualizar el <h1> al cargar la página
-document.addEventListener('DOMContentLoaded', async () => {
-    await actualizarTituloPagina(); // Actualizar el contenido del <h1>
-});
+/**
+ * Crea las partículas animadas del fondo.
+ */
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    const numParticles = 100;
+
+    for (let i = 0; i < numParticles; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.top = `${Math.random() * 100}vh`;
+        particle.style.animationDuration = `${Math.random() * 5 + 3}s`;
+        particle.style.animationDelay = `${Math.random() * 2}s`;
+        particlesContainer.appendChild(particle);
+    }
+}
