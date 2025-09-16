@@ -129,7 +129,7 @@ button:hover {
     width: 90%;
     max-width: 800px;
     margin: 20px auto;
-    padding-top: 50.625%; /* Proporción 16:9 */
+    padding-top: 26.625%; /* Proporción 16:9 */
     display: none;
     background-color: #000;
 }
@@ -164,3 +164,4 @@ button:hover {
 #playNextButton {
     background-color: #28a745; /* Color verde distintivo */
 }
+
