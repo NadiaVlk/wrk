@@ -1,6 +1,4 @@
-# Ignorar el archivo de configuración con la clave de API
 config.js
-
-# También es buena práctica ignorar otras cosas, como:
+API_KEY=e2e05b26a02be183714d56f9ad0d0900
 node_modules/
 .env
